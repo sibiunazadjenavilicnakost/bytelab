@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090b12">
+<title>ByteLab — Mobile Cyber Tools</title>
+<style>
+:root{color-scheme:dark;--bg:#090b12;--panel:#111522;--panel2:#171d2d;--line:#252d42;--muted:#8e9ab3;--text:#eef2ff;--accent:#8b7cff;--accent2:#53d6c4}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#171934 0%,var(--bg) 48%);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.shell{max-width:900px;margin:auto;padding:22px 16px 40px}
+header{display:flex;align-items:center;gap:12px;margin:6px 0 22px}.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#8b7cff,#42d6c2);display:grid;place-items:center;color:#090b12;font-weight:900;font-size:20px;box-shadow:0 8px 30px #685dff35}
+.brand{font-size:19px;font-weight:800;letter-spacing:.3px}.sub{font-size:12px;color:var(--muted);margin-top:3px}
+.tag{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:6px 9px;color:#aeb8d1;font-size:11px}
+h1{font-size:25px;line-height:1.15;margin:0 0 8px} .intro{color:var(--muted);margin:0 0 20px;line-height:1.5}
+.panel{background:linear-gradient(180deg,#141a2a,#101522);border:1px solid var(--line);border-radius:18px;padding:16px;margin:13px 0;box-shadow:0 14px 40px #0003}
+.label{display:block;font-size:12px;color:#aeb8d1;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 9px}
+textarea,select,input{width:100%;background:#0b101b;border:1px solid #29334a;border-radius:12px;color:var(--text);padding:13px;outline:none}
+textarea{min-height:145px;resize:vertical;line-height:1.5}textarea:focus,input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #8b7cff22}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.btn{border:0;border-radius:11px;padding:11px 15px;background:var(--accent);color:white;font-weight:700}.btn.secondary{background:#20283b;color:#dce3f8;border:1px solid #303b55}.btn.small{padding:9px 12px;font-size:13px}
+.out{white-space:pre-wrap;overflow-wrap:anywhere;min-height:90px;background:#0b101b;border:1px solid #29334a;border-radius:12px;padding:13px;line-height:1.5;color:#c7f7ed}
+.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:13px}
+.status{font-size:12px;color:var(--accent2);min-height:18px;margin-top:8px}
+.lock{position:fixed;inset:0;z-index:10;background:radial-gradient(ellipse at 50% 20%,#20204a,#080a11 65%);display:flex;align-items:center;justify-content:center;padding:22px}
+.lockcard{width:min(100%,360px);text-align:center;background:#111522;border:1px solid #303754;border-radius:24px;padding:28px 22px;box-shadow:0 24px 80px #0008}
+.lockicon{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;background:#242344;display:grid;place-items:center;font-size:25px}
+.lockcard h2{margin:0 0 8px;font-size:22px}.lockcard p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 18px}
+.pin{font-size:25px;text-align:center;letter-spacing:.45em;margin-bottom:12px}
+.lockcard .btn{width:100%;margin-top:12px}.error{color:#ff8c9a;min-height:19px;font-size:12px;margin-top:10px}
+.whiteout{position:fixed;inset:0;background:#fff;z-index:99}
+@media(max-width:560px){.shell{padding:18px 13px 30px}.grid{grid-template-columns:1fr}.panel{padding:14px}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div id="lock" class="lock" hidden>
+  <div class="lockcard">
+    <div class="lockicon">⌁</div>
+    <h2 id="lockTitle">Welcome to ByteLab</h2>
+    <p id="lockText">Create a PIN to lock your tools on this device.</p>
+    <input id="pin" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="••••">
+    <button id="unlock" class="btn">Continue</button>
+    <div id="lockError" class="error"></div>
+  </div>
+</div>
+<div id="app" hidden>
+<main class="shell">
+<header><div class="logo">B</div><div><div class="brand">BYTELAB</div><div class="sub">MOBILE CYBER TOOLKIT</div></div><div class="tag">LOCAL MODE</div></header>
+<h1>Transform your data.</h1>
+<p class="intro">A compact collection of encoding, decoding and text utilities. Your input is processed in this browser.</p>
+<section class="panel">
+<label class="label" for="input">Input</label>
+<textarea id="input" spellcheck="false" placeholder="Paste or type text here…"></textarea>
+<div class="actions"><button class="btn secondary small" id="paste">Paste</button><button class="btn secondary small" id="clear">Clear</button></div>
+</section>
+<section class="panel">
+<label class="label" for="operation">Operation</label>
+<select id="operation">
+<optgroup label="Encoding">
+<option value="b64enc">To Base64</option><option value="b64dec">From Base64</option>
+<option value="urlenc">URL Encode</option><option value="urldec">URL Decode</option>
+<option value="hexenc">Text to Hex</option><option value="hexdec">Hex to Text</option>
+</optgroup>
+<optgroup label="Text">
+<option value="upper">Uppercase</option><option value="lower">Lowercase</option>
+<option value="reverse">Reverse text</option><option value="rot13">ROT13</option>
+<option value="trim">Trim whitespace</option>
+</optgroup>
+<optgroup label="Hashes">
+<option value="sha256">SHA-256</option>
+</optgroup>
+</select>
+<div class="actions"><button class="btn" id="run">Run operation ↗</button><button class="btn secondary" id="swap">Use output as input</button></div>
+<div class="status" id="status" aria-live="polite"></div>
+</section>
+<section class="panel">
+<label class="label">Output</label>
+<div class="out" id="output">Your result will appear here…</div>
+<div class="actions"><button class="btn secondary small" id="copy">Copy output</button><button class="btn secondary small" id="download">Save output</button></div>
+</section>
+<p class="note">ByteLab is a lightweight starter toolkit, not a replacement for the full CyberChef operation library. The PIN is a casual access screen only; it does not encrypt the app or protect data from someone with access to the device/browser storage.</p>
+</main>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const lock = $('lock'), app = $('app'), pin = $('pin');
+let stage = 'new', attempts = 0, pendingPin = '';
+function safeGet(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
+function safeSet(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
+function safeRemove(key) { try { localStorage.removeItem(key); } catch (_) {} }
+function whiteScreen() {
+  safeSet('bytelab_whiteout', '1');
+  document.body.innerHTML = '<div class="whiteout"></div>';
+}
+function showLock() {
+  if (safeGet('bytelab_whiteout') === '1') { whiteScreen(); return; }
+  lock.hidden = false; app.hidden = true; pin.value = '';
+  const saved = safeGet('bytelab_pin');
+  stage = saved ? 'verify' : 'new';
+  $('lockTitle').textContent = saved ? 'ByteLab is locked' : 'Welcome to ByteLab';
+  $('lockText').textContent = saved ? 'Enter your PIN to continue. You have two attempts.' : 'Create a PIN for this device. Use 4–12 digits.';
+  $('unlock').textContent = saved ? 'Unlock' : 'Create PIN';
+  $('lockError').textContent = '';
+}
+function enter() {
+  const value = pin.value.trim();
+  if (stage === 'new') {
+    if (!/^\d{4,12}$/.test(value)) { $('lockError').textContent = 'Enter 4–12 digits.'; return; }
+    pendingPin = value;
+    stage = 'confirm';
+    pin.value = '';
+    $('lockTitle').textContent = 'Confirm your PIN';
+    $('lockText').textContent = 'Enter the same PIN again, then tap Confirm.';
+    $('unlock').textContent = 'Confirm PIN';
+    $('lockError').textContent = 'PIN created temporarily — confirm it to finish setup.';
+    return;
+  }
+  if (stage === 'confirm') {
+    if (value !== pendingPin) {
+      stage = 'new'; pendingPin = ''; pin.value = '';
+      $('lockTitle').textContent = 'PINs did not match';
+      $('lockText').textContent = 'Start again and enter the same PIN twice.';
+      $('unlock').textContent = 'Create PIN';
+      $('lockError').textContent = '';
+      return;
+    }
+    if (!safeSet('bytelab_pin', pendingPin)) {
+      $('lockError').textContent = 'Safari could not save the PIN. Try opening this file from a normal website address.';
+      return;
+    }
+    pendingPin = ''; lock.hidden = true; app.hidden = false; pin.value = '';
+    return;
+  }
+  const saved = safeGet('bytelab_pin');
+  if (value && value === saved) {
+    lock.hidden = true; app.hidden = false; attempts = 0; pin.value = ''; $('lockError').textContent = '';
+  } else {
+    attempts++; pin.value = '';
+    if (attempts >= 2) whiteScreen();
+    else $('lockError').textContent = 'Incorrect PIN. One attempt remaining.';
+  }
+}
+$('unlock').addEventListener('click', enter);
+pin.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); enter(); } });
+showLock();
+
+function rot13(s) { return s.replace(/[a-zA-Z]/g, c => String.fromCharCode(c.charCodeAt(0) + (c.toLowerCase() <= 'm' ? 13 : -13))); }
+async function run() {
+  const s = $('input').value, op = $('operation').value; let r = '';
+  try {
+    switch (op) {
+      case 'b64enc': r = btoa(unescape(encodeURIComponent(s))); break;
+      case 'b64dec': r = decodeURIComponent(escape(atob(s.trim()))); break;
+      case 'urlenc': r = encodeURIComponent(s); break;
+      case 'urldec': r = decodeURIComponent(s.replace(/\+/g, ' ')); break;
+      case 'hexenc': r = Array.from(new TextEncoder().encode(s)).map(b => b.toString(16).padStart(2, '0')).join(' '); break;
+      case 'hexdec': {
+        const h = s.replace(/0x/gi, '').replace(/[^0-9a-f]/gi, '');
+        if (h.length % 2) throw Error('Hex input must contain an even number of digits.');
+        r = new TextDecoder().decode(new Uint8Array(h.match(/.{2}/g)?.map(x => parseInt(x, 16)) || [])); break;
+      }
+      case 'upper': r = s.toUpperCase(); break;
+      case 'lower': r = s.toLowerCase(); break;
+      case 'reverse': r = Array.from(s).reverse().join(''); break;
+      case 'rot13': r = rot13(s); break;
+      case 'trim': r = s.trim(); break;
+      case 'sha256': {
+        const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+        r = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join(''); break;
+      }
+    }
+    $('output').textContent = r; $('status').textContent = 'Operation completed.';
+  } catch (e) { $('output').textContent = ''; $('status').textContent = 'Error: ' + e.message; }
+}
+$('run').addEventListener('click', run);
+$('clear').addEventListener('click', () => { $('input').value = ''; $('output').textContent = 'Your result will appear here…'; $('status').textContent = ''; });
+$('swap').addEventListener('click', () => { const o = $('output').textContent; if (o !== 'Your result will appear here…') { $('input').value = o; $('status').textContent = 'Output moved to input.'; } });
+$('copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('output').textContent); $('status').textContent = 'Output copied.'; } catch (_) { $('status').textContent = 'Copy is unavailable in this browser.'; } });
+$('paste').addEventListener('click', async () => { try { $('input').value = await navigator.clipboard.readText(); $('status').textContent = 'Pasted.'; } catch (_) { $('status').textContent = 'Allow clipboard access or paste manually.'; } });
+$('download').addEventListener('click', () => { const blob = new Blob([$('output').textContent], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'bytelab-output.txt'; a.click(); URL.revokeObjectURL(a.href); });
+</script>
+</body></html>
